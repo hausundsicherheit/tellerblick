@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#0c0a09">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<link rel="apple-touch-icon" href="./icon-192.png">
+<link rel="manifest" href="./manifest.webmanifest">
+<title>Tellerblick</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600&family=Public+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#0c0a09; --card:#1c1917; --line:#292524; --sunk:#0c0a09;
+  --fg:#f5f5f4; --dim:#a8a29e; --faint:#78716c;
+  --accent:#f59e0b; --accent-ink:#0c0a09;
+  --good:#34d399; --bad:#fb7185;
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+body{margin:0;background:var(--bg);color:var(--fg);
+  font-family:"Public Sans",system-ui,sans-serif;font-size:15px;line-height:1.45;
+  padding:max(18px,env(safe-area-inset-top)) 16px calc(28px + env(safe-area-inset-bottom))}
+.wrap{max-width:480px;margin:0 auto}
+h1{font-family:Fraunces,Georgia,serif;font-weight:600;font-size:30px;margin:0;letter-spacing:-.02em;color:#fef3c7}
+.sub{font-size:11px;letter-spacing:.18em;text-transform:uppercase;color:var(--faint);margin:4px 0 20px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:18px;overflow:hidden}
+.pad{padding:16px}
+.seg{display:grid;grid-template-columns:1fr 1fr;gap:4px;background:var(--card);padding:4px;border-radius:14px;margin-bottom:16px}
+.seg button{border:0;background:none;color:var(--dim);font:inherit;padding:9px;border-radius:11px}
+.seg button.on{background:var(--accent);color:var(--accent-ink);font-weight:600}
+.big{font-family:Fraunces,serif;font-size:34px;color:#fde68a;font-variant-numeric:tabular-nums}
+.row{display:flex;justify-content:space-between;align-items:baseline}
+.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:12px}
+.grid4{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:16px}
+.tile{background:var(--sunk);border-radius:11px;padding:8px 4px;text-align:center}
+.tile b{display:block;font-weight:500;font-variant-numeric:tabular-nums}
+.tile span{font-size:11px;color:var(--faint)}
+.btns{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:0 0 8px}
+button.main{background:var(--accent);color:var(--accent-ink);border:0;border-radius:13px;padding:14px;font:inherit;font-weight:600}
+button.ghost{background:none;color:var(--fg);border:1px solid #44403c;border-radius:13px;padding:14px;font:inherit}
+button:active{opacity:.75}
+input{background:var(--sunk);border:1px solid var(--line);border-radius:12px;color:var(--fg);
+  font:inherit;padding:11px 12px;width:100%}
+input[type=number]{width:96px;font-variant-numeric:tabular-nums}
+.chips{display:flex;gap:8px;margin-top:10px}
+.chips button{flex:1;background:var(--sunk);color:var(--dim);border:0;border-radius:10px;padding:8px;font:inherit;font-size:13px}
+.chips button.on{background:var(--accent);color:var(--accent-ink)}
+.tag{display:inline-block;border-radius:999px;padding:2px 9px;font-size:12px}
+.tag.read{background:#022c22;color:var(--good)}
+.tag.guess{background:var(--sunk);color:var(--dim)}
+.pill{border:1px solid;border-radius:999px;padding:2px 9px;font-size:12px}
+.hoch{color:var(--good);border-color:#065f46}.mittel{color:var(--accent);border-color:#92400e}.niedrig{color:var(--bad);border-color:#881337}
+.lbl{font-size:11px;letter-spacing:.15em;text-transform:uppercase;color:var(--faint);margin:18px 0 8px}
+ul{list-style:none;margin:0;padding:0}
+li.zt{display:flex;justify-content:space-between;gap:12px;font-size:14px;color:#e7e5e4;padding:2px 0}
+li.zs{background:var(--sunk);border-radius:10px;padding:8px 11px;margin-bottom:6px}
+li.zs em{font-style:normal;color:var(--accent);margin-right:6px}
+li.zs small{display:block;color:var(--faint)}
+.alg{display:flex;flex-wrap:wrap;gap:6px}
+.alg span{background:#4c0519;color:#fecdd3;border-radius:999px;padding:2px 9px;font-size:12px}
+li.log{display:flex;justify-content:space-between;align-items:center;background:var(--card);
+  border:1px solid var(--line);border-radius:13px;padding:10px 12px;margin-bottom:8px}
+li.log small{display:block;color:var(--faint);font-size:12px}
+.kcal{font-variant-numeric:tabular-nums;color:#fde68a}
+.del{background:none;border:0;color:var(--faint);font-size:18px;padding:0 0 0 12px}
+.err{background:#4c0519;border:1px solid #881337;color:#fecdd3;border-radius:13px;padding:12px;font-size:14px;margin-bottom:14px}
+.note{color:var(--faint);font-size:12px;margin:8px 0 22px}
+img.shot{width:100%;height:150px;object-fit:cover;display:block}
+.spin{display:inline-block;width:15px;height:15px;border:2px solid var(--faint);border-top-color:var(--accent);
+  border-radius:50%;animation:s .7s linear infinite;vertical-align:-3px;margin-right:9px}
+@keyframes s{to{transform:rotate(360deg)}}
+.hist{display:flex;align-items:flex-end;gap:5px;height:56px;margin-top:10px}
+.hist div{flex:1;background:#44403c;border-radius:3px 3px 0 0;min-height:3px}
+.hist div.today{background:var(--accent)}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>Tellerblick</h1>
+  <p class="sub">Etikett lesen · Teller schätzen</p>
+
+  <div id="gate" style="display:none">
+    <div class="card pad">
+      <p style="margin-top:0">Zugangscode eingeben — einmalig, bleibt auf diesem Gerät.</p>
+      <input id="tok" type="password" placeholder="Code" autocomplete="off">
+      <button class="main" style="width:100%;margin-top:12px" onclick="setToken()">Freischalten</button>
+    </div>
+  </div>
+
+  <div id="app" style="display:none">
+    <div class="seg">
+      <button id="m-etikett" class="on" onclick="setMode('etikett')">Etikett</button>
+      <button id="m-teller" onclick="setMode('teller')">Teller</button>
+    </div>
+
+    <div class="card pad" style="margin-bottom:18px">
+      <div class="row"><span class="sub" style="margin:0">Heute</span><span class="big" id="sum-kcal">0</span></div>
+      <div class="grid3">
+        <div class="tile"><b id="sum-p">0 g</b><span>Eiweiß</span></div>
+        <div class="tile"><b id="sum-c">0 g</b><span>Kohlenh.</span></div>
+        <div class="tile"><b id="sum-f">0 g</b><span>Fett</span></div>
+      </div>
+      <div class="hist" id="hist"></div>
+    </div>
+
+    <input id="hint" type="text" placeholder="Optional: z.B. „nur halbe Dose“" style="margin-bottom:10px">
+    <div class="btns">
+      <button class="main" onclick="pick(true)">Kamera</button>
+      <button class="ghost" onclick="pick(false)">Galerie</button>
+    </div>
+    <p class="note" id="tip"></p>
+
+    <div id="err"></div>
+    <div id="busy" style="display:none;color:var(--dim);font-size:14px;margin-bottom:14px"><span class="spin"></span><span id="busy-t">Etikett wird gelesen …</span></div>
+
+    <div id="res"></div>
+
+    <p class="lbl" id="loglbl" style="display:none">Protokoll</p>
+    <ul id="log"></ul>
+
+    <p class="note">Etikett-Modus: abgelesene Herstellerangaben. Teller-Modus: Schätzung aus dem Bild, realistisch ±20–30 %.</p>
+  </div>
+</div>
+
+<input type="file" id="file" accept="image/*" style="display:none">
+
+<script>
+const API = "https://kmfuakwbwxyfywjngexk.supabase.co/functions/v1/essen-api";
+let TOKEN = localStorage.getItem("essen_token") || "";
+let mode = "etikett", cur = null, grams = 100, shot = null;
+
+const $ = (id) => document.getElementById(id);
+const r0 = (v) => Math.round(v || 0);
+const r1 = (v) => (Math.round((v || 0) * 10) / 10).toFixed(1);
+
+function boot() {
+  if (TOKEN) { $("app").style.display = "block"; loadDay(); loadHist(); }
+  else $("gate").style.display = "block";
+  setMode(mode);
+}
+function setToken() {
+  TOKEN = $("tok").value.trim();
+  if (!TOKEN) return;
+  localStorage.setItem("essen_token", TOKEN);
+  $("gate").style.display = "none"; $("app").style.display = "block";
+  loadDay(); loadHist();
+}
+function setMode(m) {
+  mode = m;
+  $("m-etikett").className = m === "etikett" ? "on" : "";
+  $("m-teller").className = m === "teller" ? "on" : "";
+  $("hint").placeholder = m === "etikett" ? "Optional: z.B. „nur halbe Dose“" : "Optional: z.B. „in Butter gebraten“";
+  $("tip").textContent = m === "etikett"
+    ? "Rückseite fotografieren: Nährwerttabelle und Zutatenliste komplett und scharf im Bild."
+    : "Teller schräg von oben, mit Besteck oder Hand als Größenvergleich.";
+}
+async function api(payload) {
+  const res = await fetch(API, {
+    method: "POST",
+    headers: { "Content-Type": "application/json", "x-essen-token": TOKEN },
+    body: JSON.stringify(payload)
+  });
+  const d = await res.json();
+  if (!res.ok || d.error) throw new Error(d.error || ("HTTP " + res.status));
+  return d;
+}
+function fail(msg) { $("err").innerHTML = '<div class="err">' + msg + "</div>"; }
+
+function pick(camera) {
+  const f = $("file");
+  if (camera) f.setAttribute("capture", "environment"); else f.removeAttribute("capture");
+  f.value = ""; f.click();
+}
+$("file").onchange = (e) => { if (e.target.files[0]) analyse(e.target.files[0]); };
+
+function shrink(file) {
+  return new Promise((ok, no) => {
+    const fr = new FileReader();
+    fr.onerror = () => no(new Error("Datei nicht lesbar"));
+    fr.onload = () => {
+      const im = new Image();
+      im.onerror = () => no(new Error("Bild nicht lesbar"));
+      im.onload = () => {
+        const s = Math.min(1, 1400 / Math.max(im.width, im.height));
+        const c = document.createElement("canvas");
+        c.width = Math.round(im.width * s); c.height = Math.round(im.height * s);
+        c.getContext("2d").drawImage(im, 0, 0, c.width, c.height);
+        const url = c.toDataURL("image/jpeg", 0.85);
+        ok({ url, b64: url.split(",")[1] });
+      };
+      im.src = fr.result;
+    };
+    fr.readAsDataURL(file);
+  });
+}
+
+async function analyse(file) {
+  $("err").innerHTML = ""; $("res").innerHTML = "";
+  $("busy-t").textContent = mode === "etikett" ? "Etikett wird gelesen …" : "Teller wird gelesen …";
+  $("busy").style.display = "block";
+  try {
+    const img = await shrink(file);
+    shot = img.url;
+    const d = await api({ action: "analyse", mode, image_b64: img.b64, mime: "image/jpeg", hint: $("hint").value });
+    cur = d.result;
+    grams = r0(cur.portion_g || cur.packung_g || 100);
+    render();
+  } catch (e) { fail("Analyse fehlgeschlagen: " + e.message); }
+  finally { $("busy").style.display = "none"; }
+}
+
+function v(k) { return r0((Number(cur.je_100g?.[k]) || 0) * grams / 100); }
+function vf(k) { return r1((Number(cur.je_100g?.[k]) || 0) * grams / 100); }
+function setG(g) { grams = g; render(); }
+
+function render() {
+  if (!cur) return;
+  const read = cur.quelle === "etikett";
+  const chips = [];
+  if (cur.packung_g) chips.push(["½ Packung", r0(cur.packung_g / 2)], ["Ganze Packung", r0(cur.packung_g)]);
+  else if (cur.portion_g) chips.push(["½ Portion", r0(cur.portion_g / 2)], ["Portion", r0(cur.portion_g)]);
+  chips.push(["100 g", 100]);
+
+  $("res").innerHTML = `
+  <div class="card" style="margin-bottom:20px">
+    ${shot ? `<img class="shot" src="${shot}">` : ""}
+    <div class="pad">
+      <div class="row">
+        <div><div style="font-family:Fraunces,serif;font-size:20px;color:#fef3c7">${esc(cur.produkt || "")}</div>
+        <div style="font-size:12px;color:var(--faint)">${esc(cur.beschreibung || "")}</div></div>
+        <span class="pill ${cur.konfidenz || "mittel"}">${esc(cur.konfidenz || "")}</span>
+      </div>
+      <div style="margin-top:9px"><span class="tag ${read ? "read" : "guess"}">${read ? "Werte vom Etikett abgelesen" : "Werte aus dem Bild geschätzt"}</span></div>
+      <div style="margin-top:14px"><span class="big">${v("kalorien")}</span>
+        <span style="color:var(--faint);font-size:14px"> kcal für ${grams} g</span></div>
+
+      <div style="display:flex;align-items:center;gap:10px;margin-top:14px">
+        <input type="number" id="g" value="${grams}" min="1" onchange="setG(Math.max(1,+this.value||1))">
+        <span style="color:var(--faint);font-size:14px">Gramm gegessen</span>
+      </div>
+      <div class="chips">${chips.map(([l, g]) => `<button class="${g === grams ? "on" : ""}" onclick="setG(${g})">${l}</button>`).join("")}</div>
+      ${cur.packung_g ? `<p class="note" style="margin:9px 0 0">Füllmenge laut Etikett: ${cur.packung_g} g</p>` : ""}
+
+      <div class="grid4">
+        <div class="tile"><b>${v("eiweiss_g")}g</b><span>Eiweiß</span></div>
+        <div class="tile"><b>${v("kohlenhydrate_g")}g</b><span>KH</span></div>
+        <div class="tile"><b>${v("fett_g")}g</b><span>Fett</span></div>
+        <div class="tile"><b>${v("zucker_g")}g</b><span>Zucker</span></div>
+      </div>
+      <div class="grid3" style="font-size:12px;color:var(--faint);text-align:center">
+        <div>ges. Fett ${vf("gesaettigt_g")}g</div><div>Ballast. ${vf("ballaststoffe_g")}g</div><div>Salz ${vf("salz_g")}g</div>
+      </div>
+
+      ${(cur.zutaten || []).length ? `<p class="lbl">${read ? "Zutatenliste" : "Erkannt"}</p><ul>${cur.zutaten.map(z => `<li class="zt"><span>${esc(z.name)}</span><span style="color:var(--faint)">${esc(z.menge || "")}</span></li>`).join("")}</ul>` : ""}
+      ${(cur.allergene || []).length ? `<p class="lbl">Allergene</p><div class="alg">${cur.allergene.map(a => `<span>${esc(a)}</span>`).join("")}</div>` : ""}
+      ${(cur.zusatzstoffe || []).length ? `<p class="lbl">Zusatzstoffe${read ? "" : " (vermutet)"}</p><ul>${cur.zusatzstoffe.map(z => `<li class="zs">${z.code ? `<em>${esc(z.code)}</em>` : ""}${esc(z.name || "")}<small>${esc(z.zweck || "")}</small></li>`).join("")}</ul>` : ""}
+      ${cur.unsicherheit ? `<p class="note" style="margin-top:12px">${esc(cur.unsicherheit)}</p>` : ""}
+
+      <div style="display:flex;gap:10px;margin-top:18px">
+        <button class="main" style="flex:1" onclick="save()">Ins Protokoll</button>
+        <button class="ghost" style="width:56px" onclick="cur=null;shot=null;document.getElementById('res').innerHTML=''">✕</button>
+      </div>
+    </div>
+  </div>`;
+}
+
+async function save() {
+  try {
+    const p = cur.je_100g || {};
+    const e = {
+      produkt: cur.produkt, marke: cur.marke || null, quelle: cur.quelle, konfidenz: cur.konfidenz,
+      menge_g: grams, packung_g: cur.packung_g || null, je_100g: p,
+      zutaten: cur.zutaten || [], zusatzstoffe: cur.zusatzstoffe || [], allergene: cur.allergene || [],
+      notiz: $("hint").value || null
+    };
+    ["kalorien","eiweiss_g","kohlenhydrate_g","zucker_g","fett_g","gesaettigt_g","ballaststoffe_g","salz_g"]
+      .forEach(k => e[k] = Math.round((Number(p[k]) || 0) * grams / 100 * 10) / 10);
+    await api({ action: "speichern", entry: e });
+    cur = null; shot = null; $("res").innerHTML = ""; $("hint").value = "";
+    loadDay(); loadHist();
+  } catch (err) { fail("Speichern fehlgeschlagen: " + err.message); }
+}
+
+async function del(id) {
+  try { await api({ action: "loeschen", id }); loadDay(); loadHist(); }
+  catch (e) { fail("Löschen fehlgeschlagen: " + e.message); }
+}
+
+async function loadDay() {
+  try {
+    const d = await api({ action: "tag" });
+    const rows = d.eintraege || [];
+    const s = rows.reduce((a, e) => ({
+      k: a.k + +e.kalorien, p: a.p + +e.eiweiss_g, c: a.c + +e.kohlenhydrate_g, f: a.f + +e.fett_g
+    }), { k: 0, p: 0, c: 0, f: 0 });
+    $("sum-kcal").textContent = r0(s.k);
+    $("sum-p").textContent = r0(s.p) + " g";
+    $("sum-c").textContent = r0(s.c) + " g";
+    $("sum-f").textContent = r0(s.f) + " g";
+    $("loglbl").style.display = rows.length ? "block" : "none";
+    $("log").innerHTML = rows.map(e => `<li class="log"><div>
+      <div>${esc(e.produkt)} ${e.quelle === "etikett" ? '<span style="color:var(--good);font-size:11px">Etikett</span>' : ""}</div>
+      <small>${new Date(e.gegessen_um).toLocaleTimeString("de-DE",{hour:"2-digit",minute:"2-digit"})} · ${r0(e.menge_g)} g · ${r0(e.eiweiss_g)}/${r0(e.kohlenhydrate_g)}/${r0(e.fett_g)} g</small>
+      </div><div><span class="kcal">${r0(e.kalorien)}</span><button class="del" onclick="del(${e.id})">🗑</button></div></li>`).join("");
+  } catch (e) { fail("Tagesdaten nicht geladen: " + e.message); }
+}
+
+async function loadHist() {
+  try {
+    const d = await api({ action: "verlauf", tage: 14 });
+    const days = (d.tage || []).slice().reverse();
+    const max = Math.max(1, ...days.map(x => +x.kalorien));
+    const today = new Date().toISOString().slice(0, 10);
+    $("hist").innerHTML = days.map(x =>
+      `<div class="${x.tag === today ? "today" : ""}" style="height:${Math.max(4, (+x.kalorien / max) * 100)}%" title="${x.tag}: ${r0(x.kalorien)} kcal"></div>`).join("");
+  } catch (e) { $("hist").innerHTML = ""; }
+}
+
+function esc(s) { return String(s ?? "").replace(/[<>&"]/g, c => ({ "<": "&lt;", ">": "&gt;", "&": "&amp;", '"': "&quot;" }[c])); }
+
+boot();
+if ("serviceWorker" in navigator) navigator.serviceWorker.register("./sw.js");
+</script>
+</body>
+</html>
